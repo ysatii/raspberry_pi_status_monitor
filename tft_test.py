@@ -419,6 +419,26 @@ def get_moscow_time_str(blink: bool):
         return "MSK n/a"
 
 
+def get_disk_usage():
+    try:
+        st = os.statvfs("/")
+        total = (st.f_blocks * st.f_frsize) // (1024 * 1024)
+        free  = (st.f_bavail * st.f_frsize) // (1024 * 1024)
+        used  = total - free
+        return used, total
+    except Exception:
+        return None, None
+
+def disk_color(used, total):
+    if total == 0:
+        return RED
+    pct = used / total * 100
+    if pct < 70:
+        return GREEN
+    elif pct < 85:
+        return YELLOW
+    else:
+        return RED
 
 
 # РіР»Р°РІРЅС‹Р№ С†РёРєР»
@@ -449,7 +469,7 @@ while True:
     ram_used, ram_total = get_ram_used_mb()
     msk_time = get_moscow_time_str(blink)
     vcore = get_core_volts()
-
+    disk_used, disk_total = get_disk_usage()
 
 
 
@@ -548,7 +568,19 @@ while True:
     else:
         draw.text((0, line_h * 8), "VCORE: n/a", fill=RED, font=font)
 
-    
+  
+
+    if disk_used is not None:
+        color = disk_color(disk_used, disk_total)
+        draw.text(
+            (0, line_h * 9),
+            f"DISK:{disk_used}/{disk_total}MB",
+            fill=color,
+            font=font
+        )
+    else:
+        draw.text((0, line_h * 9), "DISK: n/a", fill=RED, font=font)
+
     
  
     blink = not blink
