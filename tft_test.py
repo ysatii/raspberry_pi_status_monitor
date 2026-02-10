@@ -1,4 +1,7 @@
 # проект статус монитор!
+from PIL import Image
+import os, time
+
 import time
 from datetime import datetime, timedelta, timezone
 import socket
@@ -9,6 +12,7 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
+
 
 
 
@@ -28,6 +32,16 @@ serial = spi(
 )
 
 device = st7735(serial, width=128, height=128, rotate=0, bgr=True)
+
+SPLASH_PATH = os.path.join(os.path.dirname(__file__), "splash.png")
+try:
+    splash = Image.open(SPLASH_PATH).convert("RGB")
+    splash = splash.resize((128, 128), Image.NEAREST)
+    device.display(splash)
+    time.sleep(2)
+except Exception as e:
+    print("Splash skipped:", e)
+
 
 font = ImageFont.load_default()
 line_h = font.getbbox("Ag")[3] - font.getbbox("Ag")[1]
@@ -506,7 +520,7 @@ while True:
 
 
 
-    # 1 СЃС‚СЂРѕРєР° РІС‹РІРѕРґРёРј IP Р°РґСЂРµСЃ
+    # 1 Выводим ИП адрес
     # 
     draw.text((0, 0), f"IP: {ip}:1081", fill=GREEN, font=font)
 
