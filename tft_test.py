@@ -52,9 +52,9 @@ def get_cpu_temp():
         return None
 
 def temp_color(temp):
-    if temp < 60:
+    if temp < 50:
         return GREEN
-    elif temp < 75:
+    elif temp < 65:
         return YELLOW 
     else:
         return RED
@@ -441,6 +441,37 @@ def disk_color(used, total):
         return RED
 
 
+
+def get_cpu_freq_mhz():
+    try:
+        out = subprocess.check_output(
+            ["vcgencmd", "measure_clock", "arm"],
+            text=True
+        ).strip()
+        # frequency(48)=1500000000
+        hz = int(out.split("=")[1])
+        return hz // 1_000_000
+    except Exception:
+        return None
+
+def cpu_freq_color(mhz):
+    if mhz is None:
+        return RED
+    if mhz == 600:
+        return GREEN
+    elif mhz < 1000:
+        return YELLOW
+    else:
+        return RED
+
+# --- heartbeat state ---
+hb_pos = 0
+HB_LEN = 50
+# --- inside main render loop ---
+
+
+
+
 # РіР»Р°РІРЅС‹Р№ С†РёРєР»
 # --- Main loop ---
 while True:
@@ -470,7 +501,8 @@ while True:
     msk_time = get_moscow_time_str(blink)
     vcore = get_core_volts()
     disk_used, disk_total = get_disk_usage()
-
+    cpu_freq = get_cpu_freq_mhz()
+    
 
 
 
@@ -549,7 +581,7 @@ while True:
     if ram_used is not None:
        draw.text(
            (0, line_h * 6),
-           f"RAM: {ram_used} / {ram_total} MB",
+           f"RAM USED: {ram_used} / {ram_total} MB",
            fill=WHITE,
            font=font
         )
@@ -574,14 +606,39 @@ while True:
         color = disk_color(disk_used, disk_total)
         draw.text(
             (0, line_h * 9),
-            f"DISK:{disk_used}/{disk_total}MB",
+            f"DISK: {disk_used} / {disk_total}MB",
             fill=color,
             font=font
         )
     else:
         draw.text((0, line_h * 9), "DISK: n/a", fill=RED, font=font)
 
-    
+    if cpu_freq is not None:
+        draw.text(
+            (0, line_h * 10),
+            f"CPUF:{cpu_freq}MHz",
+            fill=cpu_freq_color(cpu_freq),
+            font=font
+        )
+    else:
+        draw.text((0, line_h * 10), "CPUF: n/a", fill=RED, font=font)
+
+
+    bar = [" "] * HB_LEN
+
+    if hb_pos >= 2:
+        bar[hb_pos - 2] = "="
+    if hb_pos >= 1:
+        bar[hb_pos - 1] = "="
+    bar[hb_pos] = ">"
+    hb_pos = (hb_pos + 9) % HB_LEN
+    bar_text = "".join(bar)
+    draw.text(
+        (0, line_h * 11),
+        f"SYS {bar_text}",
+        fill=BLUE,
+        font=font
+    )
  
     blink = not blink
 
