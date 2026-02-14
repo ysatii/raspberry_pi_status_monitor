@@ -26,13 +26,17 @@ def sshd_color(cpu):
     return RED
 
 def volts_color(v):
+    """
+    CORE у Raspberry часто ~0.8–1.0V, поэтому пороги подстроены под реальность.
+    """
     if v is None:
         return RED
-    if v >= 1.1:
+    if v >= 0.90:
         return GREEN
-    if v >= 1.0:
+    if v >= 0.85:
         return YELLOW
     return RED
+
 
 def disk_color(used, total):
     if used is None or total is None or total <= 0:
