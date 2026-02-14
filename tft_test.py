@@ -22,6 +22,7 @@ from app.ui.colors import (
 from app.metrics.ram import get_ram_used_mb
 from app.metrics.disk import get_disk_usage
 from app.metrics.network import get_ip
+from app.metrics.cpu import get_cpu_temp, get_load1
 
 
  
@@ -52,13 +53,6 @@ line_h = font.getbbox("Ag")[3] - font.getbbox("Ag")[1]
 
  
 
-# --- CPU temperature ---
-def get_cpu_temp():
-    try:
-        with open("/sys/class/thermal/thermal_zone0/temp") as f:
-            return float(f.read()) / 1000.0
-    except Exception:
-        return None
  
 
 # --- Throttling ---
@@ -121,13 +115,7 @@ def get_throttled_hex():
         return None
 
 
-# --- Load average (1 min) ---
-def get_load1():
-    try:
-        with open("/proc/loadavg") as f:
-            return float(f.read().split()[0])
-    except Exception:
-        return None
+
 
 # ---SSH---
 def get_ssh_load():
