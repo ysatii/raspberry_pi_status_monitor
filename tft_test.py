@@ -23,6 +23,11 @@ from app.metrics.ram import get_ram_used_mb
 from app.metrics.disk import get_disk_usage
 from app.metrics.network import get_ip
 from app.metrics.cpu import get_cpu_temp, get_load1
+from app.metrics.cpu import (
+    get_cpu_temp, get_load1,
+    get_cpu_freq_mhz, get_throttled_hex, throttling_status
+)
+from app.metrics.power import get_core_volts
 
 
  
@@ -51,68 +56,8 @@ except Exception as e:
 font = ImageFont.load_default()
 line_h = font.getbbox("Ag")[3] - font.getbbox("Ag")[1]
 
- 
+      
 
- 
-
-# --- Throttling ---
-def throttling_status(throttled_hex: str):
-    """
-    Returns (text, color)
-    """
-    try:
-        v = int(throttled_hex, 16)
-    except Exception:
-        return ("THROTTLING READ ERROR", YELLOW)
-
-    if v == 0:
-        return ("NO THROTTLING", GREEN)
-
-    # NOW flags
-    undervolt_now = bool(v & 0x1)
-    freq_cap_now  = bool(v & 0x2)
-    throttle_now  = bool(v & 0x4)
-    temp_now      = bool(v & 0x8)
-
-    # WAS flags (sticky)
-    undervolt_was = bool(v & 0x10000)
-    freq_cap_was  = bool(v & 0x20000)
-    throttle_was  = bool(v & 0x40000)
-    temp_was      = bool(v & 0x80000)
-
-    # Priority: what is happening NOW
-    if temp_now or throttle_now:
-        return ("OVERHEAT NOW", RED)  
-
-    if undervolt_now:
-        return ("UNDERVOLT NOW", RED)
-
-    if freq_cap_now:
-        return ("FREQ CAPPED NOW", RED)
-
-    # If NOW is ok, but WAS happened
-    if temp_was or throttle_was:
-        return ("OVERHEAT WAS", YELLOW)
-
-    if undervolt_was:
-        return ("UNDERVOLT WAS", YELLOW)
-
-    if freq_cap_was:
-        return ("FREQ CAPPED WAS", YELLOW)
-
-    return (f"THROTTLED {throttled_hex}", YELLOW)
-
-        
-    
-
- 
-        
-def get_throttled_hex():
-    try:
-        out = subprocess.check_output(["vcgencmd", "get_throttled"], text=True).strip()
-        return out.split("=")[1] # 0x50005
-    except Exception:
-        return None
 
 
 
@@ -319,14 +264,7 @@ blink = False
 ssh_overload = False
 
 
-def get_core_volts():
-    try:
-        out = subprocess.check_output(["vcgencmd", "measure_volts", "core"], text=True).strip()
-        # volt=0.8625V
-        v = float(out.split("=")[1].replace("V", ""))
-        return v
-    except Exception:
-        return None
+
 
  
 
@@ -364,21 +302,7 @@ def get_moscow_time_str(blink: bool):
 
 
 
-
-def get_cpu_freq_mhz():
-    try:
-        out = subprocess.check_output(
-            ["vcgencmd", "measure_clock", "arm"],
-            text=True
-        ).strip()
-        # frequency(48)=1500000000
-        hz = int(out.split("=")[1])
-        return hz // 1_000_000
-    except Exception:
-        return None
-
  
-        return RED
 
 # --- heartbeat state ---
 hb_pos = 0
