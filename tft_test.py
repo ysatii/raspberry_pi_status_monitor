@@ -578,7 +578,7 @@ while True:
         
        #up_text = f"UP: {d}d{sep}{h:02d}{sep}{m:02d}" if d > 0 else f"UP: {h:02d}{sep}{m:02d}"
         if d > 0:
-            up_text = f"UP: {d}d{sep}{h:02d}{sep}{m:02d}"
+            up_text = f"UP: {d}d{sep}{h:02d}h{sep}{m:02d}m"
         elif h > 0:
            up_text = f"UP: {h:02d}h{sep}{m:02d}m"
         else:
