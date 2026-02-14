@@ -20,6 +20,7 @@ from app.ui.colors import (
 )
 
 from app.metrics.ram import get_ram_used_mb
+from app.metrics.disk import get_disk_usage
 
 
  
@@ -378,15 +379,7 @@ def get_moscow_time_str(blink: bool):
         return "MSK n/a"
 
 
-def get_disk_usage():
-    try:
-        st = os.statvfs("/")
-        total = (st.f_blocks * st.f_frsize) // (1024 * 1024)
-        free  = (st.f_bavail * st.f_frsize) // (1024 * 1024)
-        used  = total - free
-        return used, total
-    except Exception:
-        return None, None
+ 
 
 
 
