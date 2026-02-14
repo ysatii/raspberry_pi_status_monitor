@@ -35,6 +35,7 @@ from app.metrics.uptime import get_uptime_parts
 from app.metrics.ssh import get_ssh_load, get_sshd_cpu_top_with_count
 from app.ui.heartbeat import Heartbeat
 
+from app.display.splash import show_splash
 
 
  
@@ -51,13 +52,7 @@ serial = spi(
 device = st7735(serial, width=128, height=128, rotate=0, bgr=True)
 
 SPLASH_PATH = os.path.join(os.path.dirname(__file__), "splash.png")
-try:
-    splash = Image.open(SPLASH_PATH).convert("RGB")
-    splash = splash.resize((128, 128), Image.NEAREST)
-    device.display(splash)
-    time.sleep(2)
-except Exception as e:
-    print("Splash skipped:", e)
+
 
 
 font = ImageFont.load_default()
