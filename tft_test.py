@@ -29,6 +29,7 @@ from app.metrics.cpu import (
 )
 from app.metrics.power import get_core_volts
 from app.metrics.uptime import get_uptime_parts
+from app.metrics.ssh import get_ssh_load, get_sshd_cpu_top_with_count
 
 
  
@@ -63,17 +64,6 @@ line_h = font.getbbox("Ag")[3] - font.getbbox("Ag")[1]
 
 
 
-# ---SSH---
-def get_ssh_load():
-    try:
-        out = subprocess.check_output(
-            ["ps", "-C", "ssh", "-o", "%cpu="],
-            text=True
-        )
-        values = [float(x) for x in out.split()]
-        return sum(values)
-    except Exception:
-        return None
 CLK_TCK = os.sysconf(os.sysconf_names['SC_CLK_TCK'])
 
 _prev_total_jiffies = None
