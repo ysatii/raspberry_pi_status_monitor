@@ -33,6 +33,7 @@ from app.metrics.cpu import (
 from app.metrics.power import get_core_volts
 from app.metrics.uptime import get_uptime_parts
 from app.metrics.ssh import get_ssh_load, get_sshd_cpu_top_with_count
+from app.ui.heartbeat import Heartbeat
 
 
 
@@ -258,8 +259,9 @@ ssh_overload = False
  
 
 # --- heartbeat state ---
-hb_pos = 0
-HB_LEN = 50
+HB_LEN = 50   # как у тебя было
+hb = Heartbeat(hb_len=HB_LEN, step=9, start_pos=0)
+
 # --- inside main render loop ---
 
 
@@ -414,21 +416,15 @@ while True:
         draw.text((0, line_h * 10), "CPUF: n/a", fill=RED, font=font)
 
 
-    bar = [" "] * HB_LEN
+    hb_bar = hb.tick()
 
-    if hb_pos >= 2:
-        bar[hb_pos - 2] = "="
-    if hb_pos >= 1:
-        bar[hb_pos - 1] = "="
-    bar[hb_pos] = ">"
-    hb_pos = (hb_pos + 9) % HB_LEN
-    bar_text = "".join(bar)
     draw.text(
         (0, line_h * 11),
-        f"SYS {bar_text}",
+        f"SYS {hb_bar}",
         fill=BLUE,
         font=font
-    )
+)
+
  
     blink = not blink
 
