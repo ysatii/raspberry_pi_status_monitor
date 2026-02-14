@@ -28,6 +28,7 @@ from app.metrics.cpu import (
     get_cpu_freq_mhz, get_throttled_hex, throttling_status
 )
 from app.metrics.power import get_core_volts
+from app.metrics.uptime import get_uptime_parts
 
 
  
@@ -252,40 +253,14 @@ def get_sshd_cpu_top_with_count():
         return 0.0, 0
     except Exception:
         return None, 0
-        
-
-
-
-
-        
+     
+     
         
         
 blink = False
 ssh_overload = False
 
-
-
-
- 
-
-
-
-
-
-def get_uptime_parts():
-    try:
-        with open("/proc/uptime") as f:
-            seconds = int(float(f.read().split()[0]))
-        days = seconds // 86400
-        hours = (seconds % 86400) // 3600
-        mins = (seconds % 3600) // 60
-        return days, hours, mins
-    except Exception:
-        return None
-
-
-
-        
+       
 def get_moscow_time_str(blink: bool):
     try:
         utc_now = datetime.now(timezone.utc)
@@ -296,20 +271,12 @@ def get_moscow_time_str(blink: bool):
     except Exception:
         return "MSK n/a"
 
-
- 
-
-
-
-
  
 
 # --- heartbeat state ---
 hb_pos = 0
 HB_LEN = 50
 # --- inside main render loop ---
-
-
 
 
 # РіР»Р°РІРЅС‹Р№ С†РёРєР»
@@ -343,7 +310,6 @@ while True:
     disk_used, disk_total = get_disk_usage()
     cpu_freq = get_cpu_freq_mhz()
     
-
 
 
     # 1 Выводим ИП адрес
