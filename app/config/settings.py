@@ -1,0 +1,9 @@
+# app/config/settings.py
+
+WIDTH = 128
+HEIGHT = 128
+
+SPLASH_SECONDS = 2
+SOCKS_PORT = 1081
+SLEEP_SECONDS = 1
+
