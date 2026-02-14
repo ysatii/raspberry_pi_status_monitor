@@ -2,6 +2,9 @@
 from PIL import Image
 import os, time
 
+from app.display.fonts import load_font
+
+
 import time
 from datetime import datetime, timedelta, timezone
 import socket
@@ -48,13 +51,10 @@ SPLASH_PATH = os.path.join(os.path.dirname(__file__), "splash.png")
 show_splash(device, SPLASH_PATH)
 
 
-font = ImageFont.load_default()
-line_h = font.getbbox("Ag")[3] - font.getbbox("Ag")[1]
-
-      
+font, line_h = load_font()
 
 
-
+ 
 
 
 CLK_TCK = os.sysconf(os.sysconf_names['SC_CLK_TCK'])
@@ -412,10 +412,8 @@ while True:
         fill=BLUE,
         font=font
 )
-
  
     blink = not blink
-
 
 
     device.display(img)
