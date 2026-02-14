@@ -53,6 +53,7 @@ device = st7735(serial, width=128, height=128, rotate=0, bgr=True)
 
 SPLASH_PATH = os.path.join(os.path.dirname(__file__), "splash.png")
 
+show_splash(device, SPLASH_PATH)
 
 
 font = ImageFont.load_default()
