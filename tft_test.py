@@ -12,6 +12,9 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
+from app.ui.formatters import get_moscow_time_str
+
+
 
 from app.ui.colors import (
     RED, GREEN, YELLOW, BLUE, WHITE,
@@ -30,6 +33,7 @@ from app.metrics.cpu import (
 from app.metrics.power import get_core_volts
 from app.metrics.uptime import get_uptime_parts
 from app.metrics.ssh import get_ssh_load, get_sshd_cpu_top_with_count
+
 
 
  
@@ -250,16 +254,6 @@ def get_sshd_cpu_top_with_count():
 blink = False
 ssh_overload = False
 
-       
-def get_moscow_time_str(blink: bool):
-    try:
-        utc_now = datetime.now(timezone.utc)
-        msk = utc_now + timedelta(hours=3)
-
-        sep = ":" if blink else " "   # 
-        return f"MSK {msk:%H}{sep}{msk:%M}{sep}{msk:%S}"
-    except Exception:
-        return "MSK n/a"
 
  
 
