@@ -19,6 +19,8 @@ from app.ui.colors import (
     disk_color, cpu_freq_color, sshd_style
 )
 
+from app.metrics.ram import get_ram_used_mb
+
 
  
 
@@ -328,21 +330,6 @@ def get_sshd_cpu_top_with_count():
 
 
 
-def get_ram_used_mb():
-    try:
-        mem = {}
-        with open("/proc/meminfo") as f:
-            for line in f:
-                k, v = line.split(":")
-                mem[k] = int(v.strip().split()[0])  # kB
-
-        total = mem["MemTotal"] // 1024
-        available = mem["MemAvailable"] // 1024
-        used = total - available
-
-        return used, total
-    except Exception:
-        return None, None
 
         
         
@@ -378,21 +365,7 @@ def get_uptime_parts():
         return None
 
 
-def get_ram_used_mb():
-    try:
-        mem = {}
-        with open("/proc/meminfo") as f:
-            for line in f:
-                k, v = line.split(":")
-                mem[k] = int(v.strip().split()[0])  # kB
 
-        total = mem["MemTotal"] // 1024
-        available = mem["MemAvailable"] // 1024
-        used = total - available
-
-        return used, total
-    except Exception:
-        return None, None
         
 def get_moscow_time_str(blink: bool):
     try:
