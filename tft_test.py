@@ -13,14 +13,14 @@ import os
 import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
 
+from app.ui.colors import (
+    RED, GREEN, YELLOW, BLUE, WHITE,
+    temp_color, sshd_color, volts_color,
+    disk_color, cpu_freq_color, sshd_style
+)
 
 
-
-RED    = (255, 0, 0)
-GREEN  = (0, 255, 0)
-YELLOW = (255, 255, 0)
-BLUE   = (0, 0, 255)
-WHITE  = (255, 255, 255)
+ 
 
 # --- SPI / TFT ---
 serial = spi(
@@ -64,14 +64,7 @@ def get_cpu_temp():
             return float(f.read()) / 1000.0
     except Exception:
         return None
-
-def temp_color(temp):
-    if temp < 50:
-        return GREEN
-    elif temp < 65:
-        return YELLOW 
-    else:
-        return RED
+ 
 
 # --- Throttling ---
 def throttling_status(throttled_hex: str):
@@ -123,13 +116,7 @@ def throttling_status(throttled_hex: str):
         
     
 
-def sshd_color(cpu):
-    if cpu < 20:
-        return GREEN
-    elif cpu < 70:
-        return YELLOW
-    else:
-        return RED
+ 
         
 def get_throttled_hex():
     try:
@@ -299,14 +286,7 @@ def get_sshd_cpu_top_with_count():
     except Exception:
         return None, 0
 
-def sshd_style(sshd_cpu):
-    # ???? ?? ????? ???????
-    if sshd_cpu < 20:
-        return "green"
-    elif sshd_cpu < 70:
-        return "yellow"
-    else:
-        return "red"
+ 
 
 def get_sshd_cpu_top_with_count():
     try:
@@ -380,15 +360,7 @@ def get_core_volts():
     except Exception:
         return None
 
-def volts_color(v):
-    if v is None:
-        return RED
-    if v >= 0.85:
-        return GREEN
-    elif v >= 0.83:
-        return YELLOW
-    else:
-        return RED
+ 
 
 
 
@@ -443,16 +415,7 @@ def get_disk_usage():
     except Exception:
         return None, None
 
-def disk_color(used, total):
-    if total == 0:
-        return RED
-    pct = used / total * 100
-    if pct < 70:
-        return GREEN
-    elif pct < 85:
-        return YELLOW
-    else:
-        return RED
+
 
 
 
@@ -468,14 +431,7 @@ def get_cpu_freq_mhz():
     except Exception:
         return None
 
-def cpu_freq_color(mhz):
-    if mhz is None:
-        return RED
-    if mhz == 600:
-        return GREEN
-    elif mhz < 1000:
-        return YELLOW
-    else:
+ 
         return RED
 
 # --- heartbeat state ---
