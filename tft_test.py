@@ -40,21 +40,10 @@ from app.ui.heartbeat import Heartbeat
 
 from app.display.splash import show_splash
 
-
- 
-
 device = create_device()
-
-
 SPLASH_PATH = os.path.join(os.path.dirname(__file__), "splash.png")
-
 show_splash(device, SPLASH_PATH)
-
-
 font, line_h = load_font()
-
-
- 
 
 
 CLK_TCK = os.sysconf(os.sysconf_names['SC_CLK_TCK'])
@@ -91,75 +80,13 @@ def _read_proc_jiffies(pid):
     stime = int(parts[14])
     return utime + stime
 
-def get_sshd_cpu_percent():
-    global _prev_total_jiffies, _prev_sshd_jiffies
 
-    try:
-        total_now = _read_total_jiffies()
-        pids = _list_sshd_pids()
+        
+        
+        
 
-        # ??????? jiffies sshd ?? pid
-        sshd_now = {}
-        for pid in pids:
-            try:
-                sshd_now[pid] = _read_proc_jiffies(pid)
-            except Exception:
-                pass
-
-        # ?????? ?????? ? ??? ??????
-        if _prev_total_jiffies is None:
-            _prev_total_jiffies = total_now
-            _prev_sshd_jiffies = sshd_now
-            return 0.0
-
-        total_delta = total_now - _prev_total_jiffies
-        if total_delta <= 0:
-            _prev_total_jiffies = total_now
-            _prev_sshd_jiffies = sshd_now
-            return 0.0
-
-        # ????? ????? ?? pid (???? pid ????? ? ??????? 0 ?? ?????? ?????)
-        sshd_delta = 0
-        for pid, j in sshd_now.items():
-            prev = _prev_sshd_jiffies.get(pid, j)
-            d = j - prev
-            if d > 0:
-                sshd_delta += d
-
-        _prev_total_jiffies = total_now
-        _prev_sshd_jiffies = sshd_now
-
-        # %CPU ???????????? ???? ??????? (?? ???? ?????), ??? ? top ????????
-        percent = (sshd_delta / total_delta) * 100.0
-        return percent
-
-    except Exception:
-        return None
-def get_sshd_cpu_top():
-    try:
-        pids = subprocess.check_output(["pgrep", "ssh"], text=True).split()
-        if not pids:
-            return 0.0
-
-        pid_list = ",".join(pids)
-        out = subprocess.check_output(
-            ["top", "-b", "-n", "1", "-p", pid_list],
-            text=True,
-            stderr=subprocess.DEVNULL
-        )
-
-        total = 0.0
-        for line in out.splitlines():
-            line = line.strip()
-            if not line or not line[0].isdigit():
-                continue
-            cols = line.split()
-            total += float(cols[8].replace(",", "."))  # %CPU
-        return total
-    except subprocess.CalledProcessError:
-        return 0.0
-    except Exception:
-        return None
+        
+        
 
 def get_sshd_cpu_top_with_count():
     try:
