@@ -21,6 +21,7 @@ from app.ui.colors import (
 
 from app.metrics.ram import get_ram_used_mb
 from app.metrics.disk import get_disk_usage
+from app.metrics.network import get_ip
 
 
  
@@ -49,16 +50,7 @@ except Exception as e:
 font = ImageFont.load_default()
 line_h = font.getbbox("Ag")[3] - font.getbbox("Ag")[1]
 
-# --- IP ---
-def get_ip():
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(("8.8.8.8", 80))
-        ip = s.getsockname()[0]
-        s.close()
-        return ip
-    except Exception:
-        return "no ip"
+ 
 
 # --- CPU temperature ---
 def get_cpu_temp():
