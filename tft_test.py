@@ -6,13 +6,13 @@ import time
 from datetime import datetime, timedelta, timezone
 import socket
 import subprocess
-from luma.core.interface.serial import spi
-from luma.lcd.device import st7735
+
 from PIL import Image, ImageDraw, ImageFont
 import os
 import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
 from app.ui.formatters import get_moscow_time_str
+from app.display.device import create_device
 
 
 
@@ -40,16 +40,8 @@ from app.display.splash import show_splash
 
  
 
-# --- SPI / TFT ---
-serial = spi(
-    port=0,
-    device=0,
-    gpio_DC=25,
-    gpio_RST=24,
-    bus_speed_hz=32000000
-)
+device = create_device()
 
-device = st7735(serial, width=128, height=128, rotate=0, bgr=True)
 
 SPLASH_PATH = os.path.join(os.path.dirname(__file__), "splash.png")
 
