@@ -32,9 +32,9 @@ def volts_color(v):
     if v is None:
         return RED
     if v >= 0.90:
-        return GREEN
-    if v >= 0.85:
         return YELLOW
+    if v >= 0.85:
+        return GREEN
     return RED
 
 

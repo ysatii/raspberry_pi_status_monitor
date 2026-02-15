@@ -42,17 +42,39 @@
 ## 🗂 Структура проекта
 
 raspberry_pi_status_monitor/  
-├── app/  
-│   ├── config/  
-│   ├── core/  
-│   ├── display/  
-│   ├── metrics/  
-│   ├── ui/  
-│   └── __init__.py  
-├── splash.png  
-├── tft_test.py  
+.
+├── app  
+│   ├── config  
+│   │   ├── __init__.py  
+│   │   └── settings.py  
+│   ├── core  
+│   │   └── __init__.py  
+│   ├── display  
+│   │   ├── device.py  
+│   │   ├── fonts.py  
+│   │   ├── __init__.py  
+│   │   └── splash.py  
+│   ├── __init__.py  
+│   ├── metrics  
+│   │   ├── cpu.py  
+│   │   ├── disk.py  
+│   │   ├── __init__.py  
+│   │   ├── network.py  
+│   │   ├── power.py  
+│   │   ├── ram.py  
+│   │   ├── ssh.py  
+│   │   └── uptime.py  
+│   └── ui  
+│       ├── colors.py  
+│       ├── colors.py.save  
+│       ├── formatters.py  
+│       ├── heartbeat.py  
+│       └── __init__.py  
+├── README.md  
 ├── requirements.txt  
-└── README.md  
+├── splash.png  
+└── tft_test.py  
+
 
 ---
 
