@@ -29,7 +29,7 @@
 
 ---
 
-## Расположение
+## 📁 Расположение
 
 Проект:
 /home/pi/Desktop/raspberry_pi_status_monitor
@@ -39,7 +39,7 @@
 
 ---
 
-## Структура проекта
+## 🗂 Структура проекта
 
 raspberry_pi_status_monitor/
 ├── app/
@@ -56,7 +56,7 @@ raspberry_pi_status_monitor/
 
 ---
 
-##  Включение SPI
+## 🔌 Включение SPI
 
 sudo raspi-config  
 Interface Options → SPI → Enable  
@@ -64,7 +64,7 @@ sudo reboot
 
 ---
 
-##  Установка
+## 🚀 Установка
 
 python3 -m venv /home/pi/tftenv  
 source /home/pi/tftenv/bin/activate  
@@ -74,7 +74,7 @@ pip install -r requirements.txt
 
 ---
 
-##  requirements.txt
+## 📦 requirements.txt
 
 cbor2==5.8.0  
 luma.core==2.5.3  
@@ -86,7 +86,7 @@ spidev==3.8
 
 ---
 
-## Запуск
+## ▶ Запуск
 
 source /home/pi/tftenv/bin/activate  
 cd /home/pi/Desktop/raspberry_pi_status_monitor  
@@ -94,7 +94,7 @@ python3 -m app
 
 ---
 
-## Автозапуск через systemd
+## 🔁 Автозапуск через systemd
 
 Имя сервиса: tft.service
 
@@ -120,7 +120,7 @@ sudo systemctl start tft.service
 
 ---
 
-##  Удаление Python-кеша
+## 🧹 Удаление Python-кеша
 
 cd /home/pi/Desktop/raspberry_pi_status_monitor  
 find . -type d -name "__pycache__" -prune -exec rm -rf {} +  
@@ -134,7 +134,8 @@ __pycache__/
 
 ---
 
-## Лицензия
+## 📜 Лицензия
 
 Свободное использование и модификация.
+
 Берите , модифицируйте кто хотите!
