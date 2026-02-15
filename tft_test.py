@@ -2,8 +2,8 @@
 import os
 import time
 import subprocess
-import socket
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
+
 
 from PIL import Image, ImageDraw, ImageFont
 
