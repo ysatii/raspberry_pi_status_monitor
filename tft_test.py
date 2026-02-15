@@ -1,23 +1,18 @@
 # проект статус монитор!
-from PIL import Image
-import os, time
-
-from app.display.fonts import load_font
-
-
+import os
 import time
-from datetime import datetime, timedelta, timezone
-import socket
 import subprocess
+import socket
+from datetime import datetime, timedelta, timezone
 
 from PIL import Image, ImageDraw, ImageFont
-import os
+
 import RPi.GPIO as GPIO
 GPIO.setwarnings(False)
+
+from app.display.fonts import load_font
 from app.ui.formatters import get_moscow_time_str
 from app.display.device import create_device
-
-
 
 from app.ui.colors import (
     RED, GREEN, YELLOW, BLUE, WHITE,
@@ -28,7 +23,6 @@ from app.ui.colors import (
 from app.metrics.ram import get_ram_used_mb
 from app.metrics.disk import get_disk_usage
 from app.metrics.network import get_ip
-from app.metrics.cpu import get_cpu_temp, get_load1
 from app.metrics.cpu import (
     get_cpu_temp, get_load1,
     get_cpu_freq_mhz, get_throttled_hex, throttling_status
@@ -39,6 +33,7 @@ from app.metrics.ssh import get_ssh_load, get_sshd_cpu_top_with_count
 from app.ui.heartbeat import Heartbeat
 
 from app.display.splash import show_splash
+
 
 device = create_device()
 SPLASH_PATH = os.path.join(os.path.dirname(__file__), "splash.png")
