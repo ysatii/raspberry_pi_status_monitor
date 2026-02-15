@@ -41,18 +41,18 @@
 
 ## 🗂 Структура проекта
 
-raspberry_pi_status_monitor/
-├── app/
-│   ├── config/
-│   ├── core/
-│   ├── display/
-│   ├── metrics/
-│   ├── ui/
-│   └── __init__.py
-├── splash.png
-├── tft_test.py
-├── requirements.txt
-└── README.md
+raspberry_pi_status_monitor/  
+├── app/  
+│   ├── config/  
+│   ├── core/  
+│   ├── display/  
+│   ├── metrics/  
+│   ├── ui/  
+│   └── __init__.py  
+├── splash.png  
+├── tft_test.py  
+├── requirements.txt  
+└── README.md  
 
 ---
 
@@ -136,6 +136,5 @@ __pycache__/
 
 ## 📜 Лицензия
 
-Свободное использование и модификация.
-
+Свободное использование и модификация.  
 Берите , модифицируйте кто хотите!
