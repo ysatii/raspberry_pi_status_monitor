@@ -83,81 +83,10 @@ def _read_proc_jiffies(pid):
         
         
 
-def get_sshd_cpu_top_with_count():
-    try:
-        pids = subprocess.check_output(["pgrep", "ssh"], text=True).split()
-        if not pids:
-            return 0.0, 0
 
-        pid_list = ",".join(pids)
-        out = subprocess.check_output(
-            ["top", "-b", "-n", "1", "-p", pid_list],
-            text=True,
-            stderr=subprocess.DEVNULL
-        )
-
-        total = 0.0
-        found_lines = 0
-
-        for line in out.splitlines():
-            line = line.strip()
-            if not line or not line[0].isdigit():
-                continue
-
-            cols = line.split()
-            # ? standard top: ... S %CPU %MEM ...
-            # %CPU ?????? cols[8]
-            try:
-                total += float(cols[8].replace(",", "."))
-                found_lines += 1
-            except Exception:
-                pass
-
-        return total, found_lines
-
-    except subprocess.CalledProcessError:
-        return 0.0, 0
-    except Exception:
-        return None, 0
 
  
 
-def get_sshd_cpu_top_with_count():
-    try:
-        pids = subprocess.check_output(["pgrep", "ssh"], text=True).split()
-        if not pids:
-            return 0.0, 0
-
-        pid_list = ",".join(pids)
-        out = subprocess.check_output(
-            ["top", "-b", "-n", "1", "-p", pid_list],
-            text=True,
-            stderr=subprocess.DEVNULL
-        )
-
-        total = 0.0
-        lines = 0
-        for line in out.splitlines():
-            line = line.strip()
-            if not line or not line[0].isdigit():
-                continue
-            cols = line.split()
-
-            # ?????? %CPU ????? ???? ?? ?? 8 ??????? ??-?? ?????? ?????? top.
-            # ????????? ?????????: ?????? ???????, ??????? ?? ????? ? ??????, ????? ? %MEM.
-            # ?? ??????? ? ??????????? ???????:
-            try:
-                total += float(cols[8].replace(",", "."))
-                lines += 1
-                continue
-            except Exception:
-                pass
-
-        return total, lines
-    except subprocess.CalledProcessError:
-        return 0.0, 0
-    except Exception:
-        return None, 0
      
      
         
