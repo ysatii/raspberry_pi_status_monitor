@@ -32,6 +32,7 @@ from app.metrics.ssh import get_ssh_load, get_sshd_cpu_top_with_count
 from app.ui.heartbeat import Heartbeat
 
 from app.display.splash import show_splash
+from app.config.settings import SLEEP_SECONDS
 
 
 device = create_device()
@@ -267,4 +268,4 @@ while True:
 
 
     device.display(img)
-    time.sleep(1)
+    time.sleep(SLEEP_SECONDS)
