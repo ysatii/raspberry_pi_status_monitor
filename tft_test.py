@@ -33,6 +33,15 @@ from app.ui.heartbeat import Heartbeat
 
 from app.display.splash import show_splash
 from app.config.settings import SLEEP_SECONDS
+from app.config.settings import FRAME_PERIOD
+
+try:
+    from app.config.settings import FRAME_PERIOD
+except Exception:
+    FRAME_PERIOD = 1.0
+
+
+
 
 
 device = create_device()
@@ -107,6 +116,7 @@ hb = Heartbeat(hb_len=HB_LEN, step=9, start_pos=0)
 # РіР»Р°РІРЅС‹Р№ С†РёРєР»
 # --- Main loop ---
 while True:
+    frame_start = time.monotonic()
     
     img = Image.new("RGB", (128, 128), "black")
     draw = ImageDraw.Draw(img)
