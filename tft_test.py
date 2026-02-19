@@ -40,6 +40,7 @@ try:
 except Exception:
     FRAME_PERIOD = 1.0
 
+import threading
 
 
 
@@ -91,6 +92,21 @@ def _read_proc_jiffies(pid):
 
         
         
+state_lock = threading.Lock()
+state = {"tick": 0}
+
+stop_event = threading.Event()
+
+def collector():
+    while not stop_event.is_set():
+        with state_lock:
+            state["tick"] += 1
+        time.sleep(1)
+
+collector_thread = threading.Thread(target=collector, daemon=True)
+collector_thread.start()
+
+snap_counter = 0   # ← вот тут объявляем
 
 
 
@@ -116,6 +132,14 @@ hb = Heartbeat(hb_len=HB_LEN, step=9, start_pos=0)
 # РіР»Р°РІРЅС‹Р№ С†РёРєР»
 # --- Main loop ---
 while True:
+    with state_lock:
+        snap = dict(state)
+        
+    snap_counter += 1
+    if snap_counter % 10 == 0:
+        print("SNAP OK, tick=", snap.get("tick"))
+
+    
     frame_start = time.monotonic()
     
     img = Image.new("RGB", (128, 128), "black")
