@@ -41,6 +41,7 @@ except Exception:
     FRAME_PERIOD = 1.0
 
 import threading
+from app.config.settings import DEBUG
 
 
 
@@ -93,15 +94,36 @@ def _read_proc_jiffies(pid):
         
         
 state_lock = threading.Lock()
-state = {"tick": 0}
+state = {
+    "tick": 0,
+    "disk": None,
+    "disk_ts": 0.0,
+}
+
 
 stop_event = threading.Event()
 
 def collector():
     while not stop_event.is_set():
+        now = time.monotonic()
+
+        # решаем под lock, надо ли обновлять диск
         with state_lock:
             state["tick"] += 1
+            need_disk = (now - state["disk_ts"] >= 15.0)
+            if need_disk:
+                state["disk_ts"] = now
+
+        # тяжёлое делаем БЕЗ lock
+        if need_disk:
+            if DEBUG:
+                print("DISK UPDATE:", time.strftime("%H:%M:%S"))
+            d = get_disk_usage()
+            with state_lock:
+                state["disk"] = d
+
         time.sleep(1)
+
 
 collector_thread = threading.Thread(target=collector, daemon=True)
 collector_thread.start()
@@ -137,7 +159,8 @@ while True:
         
     snap_counter += 1
     if snap_counter % 10 == 0:
-        print("SNAP OK, tick=", snap.get("tick"))
+        if DEBUG:
+            print("SNAP OK, tick=", snap.get("tick"))
 
     
     frame_start = time.monotonic()
@@ -166,7 +189,20 @@ while True:
     ram_used, ram_total = get_ram_used_mb()
     msk_time = get_moscow_time_str(blink)
     vcore = get_core_volts()
-    disk_used, disk_total = get_disk_usage()
+    d = snap.get("disk")
+
+    if d is None:
+        disk_used, disk_total = get_disk_usage()
+    else:
+        disk_used, disk_total = d
+
+    if disk_used is not None and disk_total:
+        disk_pct = int((disk_used / disk_total) * 100)
+    else:
+        disk_pct = 0
+
+    
+    
     cpu_freq = get_cpu_freq_mhz()
     
 
@@ -188,7 +224,8 @@ while True:
         if t_color==RED:
             t_color = WHITE if blink else RED
         draw.text((0, line_h * 2), t_text, fill=t_color, font=font)
-        print("throttled:", t_text)
+        if DEBUG:
+            print("throttled:", t_text)
     else:
         draw.text((0, line_h * 2), "THROTTLING n/a", fill=GREEN, font=font)
     
@@ -202,7 +239,8 @@ while True:
     # 5 ?????? ? SSHD %CPU (??? top)
     # 5 ?????? ? SSHD %CPU + count, ????? ???? + ??????? ??? >100%
 
-    print("DEBUG SSHD:", sshd_cpu, sshd_cnt)
+    if DEBUG:
+        print("DEBUG SSHD:", sshd_cpu, sshd_cnt)
 
     if sshd_cpu is not None:
         color = sshd_color(sshd_cpu)
