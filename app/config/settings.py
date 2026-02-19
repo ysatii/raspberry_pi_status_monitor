@@ -10,3 +10,5 @@ FRAME_PERIOD = 1.0
 
 
 SPLASH_SECONDS = 2
+DEBUG = False
+
