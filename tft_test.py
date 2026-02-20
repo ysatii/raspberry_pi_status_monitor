@@ -98,7 +98,10 @@ state = {
     "tick": 0,
     "disk": None,
     "disk_ts": 0.0,
+    "net_ip": None,
+    "net_ts": 0.0,
 }
+
 
 
 stop_event = threading.Event()
@@ -106,13 +109,19 @@ stop_event = threading.Event()
 def collector():
     while not stop_event.is_set():
         now = time.monotonic()
+        need_disk = False
+        need_net = False
 
         # решаем под lock, надо ли обновлять диск
         with state_lock:
             state["tick"] += 1
-            need_disk = (now - state["disk_ts"] >= 15.0)
+            need_disk = (now - state["disk_ts"] >= 2.0)
             if need_disk:
                 state["disk_ts"] = now
+            
+            need_net = (now - state["net_ts"] >= 5.0)
+            if need_net:
+                state["net_ts"] = now
 
         # тяжёлое делаем БЕЗ lock
         if need_disk:
@@ -121,6 +130,12 @@ def collector():
             d = get_disk_usage()
             with state_lock:
                 state["disk"] = d
+        if need_net:
+            if DEBUG:
+                print("ip:", time.strftime("%H:%M:%S"))
+            ip = get_ip()
+            with state_lock:
+                state["net_ip"] = ip
 
         time.sleep(1)
 
@@ -168,7 +183,10 @@ while True:
     img = Image.new("RGB", (128, 128), "black")
     draw = ImageDraw.Draw(img)
 
-    ip = get_ip()
+    ip = snap.get("net_ip")
+    if not ip:
+        ip = get_ip()
+    
     temp = get_cpu_temp()
     #throttled = throttling_status
     throttled = get_throttled_hex()
