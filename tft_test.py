@@ -100,6 +100,9 @@ state = {
     "disk_ts": 0.0,
     "net_ip": None,
     "net_ts": 0.0,
+    "sshd": None,
+    "sshd_ts": 0.0,
+
 }
 
 
@@ -111,6 +114,8 @@ def collector():
         now = time.monotonic()
         need_disk = False
         need_net = False
+        need_sshd = False
+
 
         # решаем под lock, надо ли обновлять диск
         with state_lock:
@@ -122,6 +127,11 @@ def collector():
             need_net = (now - state["net_ts"] >= 5.0)
             if need_net:
                 state["net_ts"] = now
+            
+            if now - state["sshd_ts"] >= 3.0:
+                state["sshd_ts"] = now
+                need_sshd = True
+
 
         # тяжёлое делаем БЕЗ lock
         if need_disk:
@@ -136,6 +146,15 @@ def collector():
             ip = get_ip()
             with state_lock:
                 state["net_ip"] = ip
+        
+        if need_sshd:
+            if DEBUG:
+                print("sshd:", time.strftime("%H:%M:%S"))
+            ssh_load = get_ssh_load()
+            top_cpu, top_pid = get_sshd_cpu_top_with_count()
+            with state_lock:
+                state["sshd"] = (ssh_load, top_cpu, top_pid)
+
 
         time.sleep(1)
 
@@ -192,8 +211,19 @@ while True:
     throttled = get_throttled_hex()
 
     load1 = get_load1()
-    ssh_load = get_ssh_load()
-    sshd_cpu, sshd_cnt = get_sshd_cpu_top_with_count()
+    s = snap.get("sshd")
+    if s is None:
+        ssh_load = get_ssh_load()
+        top_cpu, top_pid = get_sshd_cpu_top_with_count()
+    else:
+        ssh_load, top_cpu, top_pid = s
+
+    sshd_cpu = top_cpu
+    sshd_cnt = ssh_load
+
+
+    
+    
     if sshd_cpu is not None and sshd_cpu > 100:
         ssh_overload = True 
     else:
