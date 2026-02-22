@@ -108,6 +108,10 @@ state = {
     "volts_ts": 0.0,
     "cpu_temp": None,
     "cpu_temp_ts": 0.0,
+    "cpu_freq": None,
+    "cpu_freq_ts": 0.0,
+    "load1": None,
+    "load1_ts": 0.0,
 }
 
 
@@ -123,6 +127,8 @@ def collector():
         need_throttled = False
         need_volts = False
         need_temp = False
+        need_freq = False
+        need_load = False
 
         # решаем под lock, надо ли обновлять диск
         with state_lock:
@@ -150,6 +156,14 @@ def collector():
             if now - state["cpu_temp_ts"] >= 2.0:
                 state["cpu_temp_ts"] = now
                 need_temp = True    
+                
+            if now - state["cpu_freq_ts"] >= 1.0:
+                state["cpu_freq_ts"] = now
+                need_freq = True
+
+            if now - state["load1_ts"] >= 1.0:
+                state["load1_ts"] = now
+                need_load = True
 
 
         # тяжёлое делаем БЕЗ lock
@@ -193,7 +207,21 @@ def collector():
             if DEBUG:
                 print("temp:", time.strftime("%H:%M:%S"), t)
             with state_lock:
-                state["cpu_temp"] = t        
+                state["cpu_temp"] = t
+                
+        if need_freq:
+            f = get_cpu_freq_mhz()
+            if DEBUG and need_freq:
+                print("freq:", time.strftime("%H:%M:%S"), f)
+            with state_lock:
+                state["cpu_freq"] = f
+
+        if need_load:
+            l1 = get_load1()
+            if DEBUG and need_load:
+                print("load1:", time.strftime("%H:%M:%S"), l1)
+            with state_lock:
+                state["load1"] = l1       
 
 
 
@@ -255,7 +283,11 @@ while True:
     #throttled = throttling_status
     throttled = get_throttled_hex()
 
-    load1 = get_load1()
+    load1 = snap.get("load1")
+    if load1 is None:
+        load1 = get_load1()
+    
+    
     s = snap.get("sshd")
     if s is None:
         ssh_load = get_ssh_load()
@@ -303,7 +335,9 @@ while True:
 
     
     
-    cpu_freq = get_cpu_freq_mhz()
+    cpu_freq = snap.get("cpu_freq")
+    if cpu_freq is None:
+        cpu_freq = get_cpu_freq_mhz()
     
 
 
