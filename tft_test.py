@@ -104,6 +104,10 @@ state = {
     "sshd_ts": 0.0,
     "throttled_hex": None,
     "throttled_ts": 0.0,
+    "volts": None,
+    "volts_ts": 0.0,
+    
+    
 }
 
 
@@ -117,6 +121,7 @@ def collector():
         need_net = False
         need_sshd = False
         need_throttled = False
+        need_volts = False
 
         # решаем под lock, надо ли обновлять диск
         with state_lock:
@@ -136,6 +141,10 @@ def collector():
             if now - state["throttled_ts"] >= 2.0:
                 state["throttled_ts"] = now
                 need_throttled = True
+           
+            if now - state["volts_ts"] >= 2.0:
+                state["volts_ts"] = now
+                need_volts = True
 
 
         # тяжёлое делаем БЕЗ lock
@@ -166,6 +175,13 @@ def collector():
                 print("throttled_hex:", th, time.strftime("%H:%M:%S"))
             with state_lock:
                 state["throttled"] = th
+        
+        if need_volts:
+            v = get_core_volts()
+            if DEBUG:
+                print("volts:", v, time.strftime("%H:%M:%S"))
+            with state_lock:
+                state["volts"] = v
 
 
 
@@ -251,7 +267,12 @@ while True:
     upt = get_uptime_parts()
     ram_used, ram_total = get_ram_used_mb()
     msk_time = get_moscow_time_str(blink)
-    vcore = get_core_volts()
+    
+    vcore = snap.get("volts")
+    if vcore is None:
+        vcore = get_core_volts()
+        
+        
     d = snap.get("disk")
 
     if d is None:
