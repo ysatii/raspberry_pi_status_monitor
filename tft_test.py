@@ -219,7 +219,7 @@ while True:
         ssh_load, top_cpu, top_pid = s
 
     sshd_cpu = top_cpu
-    sshd_cnt = ssh_load
+    sshd_load = ssh_load
 
 
     
@@ -288,7 +288,7 @@ while True:
     # 5 ?????? ? SSHD %CPU + count, ????? ???? + ??????? ??? >100%
 
     if DEBUG:
-        print("DEBUG SSHD:", sshd_cpu, sshd_cnt)
+        print("DEBUG SSHD:", sshd_cpu, sshd_load)
 
     if sshd_cpu is not None:
         color = sshd_color(sshd_cpu)
@@ -299,7 +299,7 @@ while True:
 
         draw.text(
             (0, line_h * 4),
-            f"SSHD:{sshd_cpu:.1f}% ({sshd_cnt})",
+            f"SSHD:{sshd_cpu:.1f}% (load {sshd_load})",
             fill=color,
             font=font
         )
