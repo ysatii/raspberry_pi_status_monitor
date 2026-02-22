@@ -102,7 +102,8 @@ state = {
     "net_ts": 0.0,
     "sshd": None,
     "sshd_ts": 0.0,
-
+    "throttled_hex": None,
+    "throttled_ts": 0.0,
 }
 
 
@@ -115,7 +116,7 @@ def collector():
         need_disk = False
         need_net = False
         need_sshd = False
-
+        need_throttled = False
 
         # решаем под lock, надо ли обновлять диск
         with state_lock:
@@ -131,6 +132,10 @@ def collector():
             if now - state["sshd_ts"] >= 3.0:
                 state["sshd_ts"] = now
                 need_sshd = True
+            
+            if now - state["throttled_ts"] >= 2.0:
+                state["throttled_ts"] = now
+                need_throttled = True
 
 
         # тяжёлое делаем БЕЗ lock
@@ -154,6 +159,14 @@ def collector():
             top_cpu, top_pid = get_sshd_cpu_top_with_count()
             with state_lock:
                 state["sshd"] = (ssh_load, top_cpu, top_pid)
+        
+        if need_throttled:
+            th = get_throttled_hex()
+            if DEBUG:
+                print("throttled_hex:", th, time.strftime("%H:%M:%S"))
+            with state_lock:
+                state["throttled"] = th
+
 
 
         time.sleep(1)
@@ -220,6 +233,8 @@ while True:
 
     sshd_cpu = top_cpu
     sshd_load = ssh_load
+    
+    th = get_throttled_hex()
 
 
     
@@ -267,13 +282,12 @@ while True:
 
     # 3 ?????? ? Throttling (?????)
     
-    if throttled:
-        t_text, t_color = throttling_status(throttled)
+    if th:
+        t_text, t_color = throttling_status(th)
         if t_color==RED:
             t_color = WHITE if blink else RED
         draw.text((0, line_h * 2), t_text, fill=t_color, font=font)
-        if DEBUG:
-            print("throttled:", t_text)
+        
     else:
         draw.text((0, line_h * 2), "THROTTLING n/a", fill=GREEN, font=font)
     
