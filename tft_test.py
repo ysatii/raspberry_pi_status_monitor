@@ -106,8 +106,8 @@ state = {
     "throttled_ts": 0.0,
     "volts": None,
     "volts_ts": 0.0,
-    
-    
+    "cpu_temp": None,
+    "cpu_temp_ts": 0.0,
 }
 
 
@@ -122,6 +122,7 @@ def collector():
         need_sshd = False
         need_throttled = False
         need_volts = False
+        need_temp = False
 
         # решаем под lock, надо ли обновлять диск
         with state_lock:
@@ -145,6 +146,10 @@ def collector():
             if now - state["volts_ts"] >= 2.0:
                 state["volts_ts"] = now
                 need_volts = True
+            
+            if now - state["cpu_temp_ts"] >= 2.0:
+                state["cpu_temp_ts"] = now
+                need_temp = True    
 
 
         # тяжёлое делаем БЕЗ lock
@@ -182,6 +187,13 @@ def collector():
                 print("volts:", v, time.strftime("%H:%M:%S"))
             with state_lock:
                 state["volts"] = v
+                
+        if need_temp:
+            t = get_cpu_temp()
+            if DEBUG:
+                print("temp:", time.strftime("%H:%M:%S"), t)
+            with state_lock:
+                state["cpu_temp"] = t        
 
 
 
@@ -235,7 +247,11 @@ while True:
     if not ip:
         ip = get_ip()
     
-    temp = get_cpu_temp()
+    temp = snap.get("cpu_temp")
+    if temp is None:
+        temp = get_cpu_temp()
+    
+    
     #throttled = throttling_status
     throttled = get_throttled_hex()
 
