@@ -251,6 +251,15 @@ snap_counter = 0   # ← вот тут объявляем
 blink = False
 ssh_overload = False
 
+time_bar_pos = 0
+TIME_BAR_LEN = 10
+
+
+
+
+blink = False
+blink_last = time.monotonic()
+BLINK_PERIOD = 0.5   # секунды, можно 0.5 если хочешь чаще
 
  
 
@@ -435,8 +444,11 @@ while True:
             fill=RED,
             font=font
         )
-
-    draw.text((0, line_h * 7), msk_time, fill=WHITE, font=font)
+    
+    
+    bar = (" " * time_bar_pos) + "|" + (" " * (TIME_BAR_LEN - time_bar_pos - 1))
+    time_bar_pos = (time_bar_pos + 1) % TIME_BAR_LEN
+    draw.text((0, line_h * 7), f"{msk_time} {bar}", fill=WHITE, font=font)
     
     if vcore is not None:
         draw.text((0, line_h * 8), f"VCORE: {vcore:.3f}V", fill=volts_color(vcore), font=font)
@@ -476,8 +488,11 @@ while True:
         font=font
 )
  
-    blink = not blink
+    now_b = time.monotonic()
+    if now_b - blink_last >= BLINK_PERIOD:
+        blink = not blink
+        blink_last = now_b
 
 
     device.display(img)
-    time.sleep(SLEEP_SECONDS)
+    time.sleep(DISPLAY_PERIOD)
