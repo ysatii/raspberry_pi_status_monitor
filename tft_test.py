@@ -33,7 +33,14 @@ from app.ui.heartbeat import Heartbeat
 
 from app.display.splash import show_splash
 from app.config.settings import SLEEP_SECONDS
-from app.config.settings import FRAME_PERIOD
+from app.config.settings import (
+    DEBUG,
+    SLEEP_SECONDS,  # если ещё используется
+    DISK_PERIOD, IP_PERIOD, SSHD_PERIOD,
+    THROTTLED_PERIOD, VOLTS_PERIOD,
+    CPU_FREQ_PERIOD, LOAD1_PERIOD, CPU_TEMP_PERIOD,
+    DISPLAY_PERIOD
+)
 
 try:
     from app.config.settings import FRAME_PERIOD
@@ -133,35 +140,35 @@ def collector():
         # решаем под lock, надо ли обновлять диск
         with state_lock:
             state["tick"] += 1
-            need_disk = (now - state["disk_ts"] >= 2.0)
+            need_disk = (now - state["disk_ts"] >= DISK_PERIOD)
             if need_disk:
                 state["disk_ts"] = now
             
-            need_net = (now - state["net_ts"] >= 5.0)
+            need_net = (now - state["net_ts"] >= IP_PERIOD)
             if need_net:
                 state["net_ts"] = now
             
-            if now - state["sshd_ts"] >= 3.0:
+            if now - state["sshd_ts"] >= SSHD_PERIOD:
                 state["sshd_ts"] = now
                 need_sshd = True
             
-            if now - state["throttled_ts"] >= 2.0:
+            if now - state["throttled_ts"] >= THROTTLED_PERIOD:
                 state["throttled_ts"] = now
                 need_throttled = True
            
-            if now - state["volts_ts"] >= 2.0:
+            if now - state["volts_ts"] >= VOLTS_PERIOD:
                 state["volts_ts"] = now
                 need_volts = True
             
-            if now - state["cpu_temp_ts"] >= 2.0:
+            if now - state["cpu_temp_ts"] >= CPU_TEMP_PERIOD:
                 state["cpu_temp_ts"] = now
                 need_temp = True    
                 
-            if now - state["cpu_freq_ts"] >= 1.0:
+            if now - state["cpu_freq_ts"] >= CPU_FREQ_PERIOD:
                 state["cpu_freq_ts"] = now
                 need_freq = True
 
-            if now - state["load1_ts"] >= 1.0:
+            if now - state["load1_ts"] >= LOAD1_PERIOD:
                 state["load1_ts"] = now
                 need_load = True
 
