@@ -252,7 +252,7 @@ blink = False
 ssh_overload = False
 
 time_bar_pos = 0
-TIME_BAR_LEN = 10
+TIME_BAR_LEN = 5
 
 
 
@@ -265,9 +265,14 @@ BLINK_PERIOD = 0.5   # секунды, можно 0.5 если хочешь ча
 
 # --- heartbeat state ---
 HB_LEN = 50   # как у тебя было
-hb = Heartbeat(hb_len=HB_LEN, step=9, start_pos=0)
+hb = Heartbeat(hb_len=HB_LEN, step=6, start_pos=0)
 
 # --- inside main render loop ---
+
+
+
+frame_counter = 0
+fps_last = time.monotonic()
 
 
 # РіР»Р°РІРЅС‹Р№ С†РёРєР»
@@ -493,6 +498,14 @@ while True:
         blink = not blink
         blink_last = now_b
 
+    frame_counter += 1
+    now_fps = time.monotonic()
+
+    if now_fps - fps_last >= 1.0:
+        if DEBUG:
+            print("FPS:", frame_counter)
+        frame_counter = 0
+        fps_last = now_fps
 
     device.display(img)
     time.sleep(DISPLAY_PERIOD)
