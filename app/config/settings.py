@@ -23,5 +23,5 @@ LOAD1_PERIOD = 1.0
 CPU_TEMP_PERIOD = 2.0
 
 # частота обновления экрана (пока оставляем как есть)
-DISPLAY_PERIOD = 1.0
+DISPLAY_PERIOD = 0.2
 
