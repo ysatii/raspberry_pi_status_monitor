@@ -123,22 +123,22 @@ python3 -m app
 /etc/systemd/system/tft.service
 
 [Unit]
-Description=Raspberry Pi TFT Status Monitor
-After=network.target
+Description=TFT SPI Monitor
+After=network-online.target
+Wants=network-online.target
 
 [Service]
+Type=simple
 User=pi
 WorkingDirectory=/home/pi/Desktop/raspberry_pi_status_monitor
-ExecStart=/home/pi/tftenv/bin/python3 -m app
+Environment=PYTHONUNBUFFERED=1
+ExecStartPre=/bin/sleep 2
+ExecStart=/home/pi/tftenv/bin/python /home/pi/Desktop/raspberry_pi_status_monit>
 Restart=always
-RestartSec=2
+RestartSec=3
 
 [Install]
-WantedBy=multi-user.target
-
-sudo systemctl daemon-reload  
-sudo systemctl enable tft.service  
-sudo systemctl start tft.service
+WantedBy=multi-user.targe
 
 ---
 
@@ -155,6 +155,35 @@ __pycache__/
 *.pyd  
 
 ---
+
+## ⚠ Особенности инициализации дисплея ST7735
+
+Файл:  
+`/home/pi/Desktop/raspberry_pi_status_monitor/app/display/device.py`
+
+В процессе разработки было обнаружено, что некоторые SPI-дисплеи **ST7735 (128×128)** могут нестабильно инициализироваться при быстром запуске или перезапуске приложения.
+
+### Симптомы
+
+- дисплей включается, но остаётся **чёрный экран**
+- иногда дисплей начинает работать только после повторного запуска
+- при быстром перезапуске службы `systemd` инициализация может не происходить
+
+### Причина
+
+Контроллер дисплея требует **аппаратного сброса (RST)** и времени для выхода из состояния reset.  
+Без задержек контроллер может не принять первые SPI-команды.
+
+### Решение
+
+Для обеспечения стабильной инициализации используется следующая последовательность:
+
+```python
+GPIO.cleanup()
+time.sleep(1)
+
+hardware_reset()
+time.sleep(1)
 
 ## 📜 Лицензия
 
