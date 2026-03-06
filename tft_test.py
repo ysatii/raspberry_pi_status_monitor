@@ -54,6 +54,8 @@ from app.config.settings import DEBUG
 
 
 device = create_device()
+
+
 SPLASH_PATH = os.path.join(os.path.dirname(__file__), "splash.png")
 show_splash(device, SPLASH_PATH)
 font, line_h = load_font()
